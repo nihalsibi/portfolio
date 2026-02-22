@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Web Design & Development{% endblock %} | Your Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'pages/css/style.css' %}">
+</head>
+<body>
+    <div class="page-bg" style="background-image: url('{% static 'pages/images/background.jpg' %}');"></div>
+    <div class="particles" aria-hidden="true">
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+        <span class="particle"></span>
+    </div>
+    <header class="site-header">
+        <nav class="container nav">
+            <a href="{% url 'home' %}" class="logo">NihalSibi</a>
+            <ul class="nav-links">
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'about' %}">About</a></li>
+                <li><a href="{% url 'templates' %}">Templates</a></li>
+                <li><a href="{% url 'pricing' %}">Pricing</a></li>
+                <li><a href="{% url 'contact' %}">Contact</a></li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle menu">
+                <span></span><span></span><span></span>
+            </button>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <p>&copy; {% now "Y" %} Your Portfolio. Professional websites that convert.</p>
+            <nav class="footer-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'about' %}">About</a>
+                <a href="{% url 'templates' %}">Templates</a>
+                <a href="{% url 'pricing' %}">Pricing</a>
+                <a href="{% url 'contact' %}">Contact</a>
+            </nav>
+        </div>
+    </footer>
+
+    <script>
+        document.querySelector('.nav-toggle').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('open');
+            this.classList.toggle('active');
+        });
+
+        (function() {
+            var header = document.querySelector('.site-header');
+            var lastScrollY = window.scrollY || window.pageYOffset;
+            var threshold = 60;
+
+            function onScroll() {
+                var scrollY = window.scrollY || window.pageYOffset;
+                if (scrollY <= 20) {
+                    header.classList.remove('nav-hidden');
+                } else if (scrollY > lastScrollY && scrollY > threshold) {
+                    header.classList.add('nav-hidden');
+                } else if (scrollY < lastScrollY) {
+                    header.classList.remove('nav-hidden');
+                }
+                lastScrollY = scrollY;
+            }
+
+            var ticking = false;
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    requestAnimationFrame(function() {
+                        onScroll();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            }, { passive: true });
+        })();
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

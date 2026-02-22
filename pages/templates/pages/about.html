@@ -1,0 +1,20 @@
+{% extends 'pages/base.html' %}
+{% block title %}About{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-hero">
+        <h1>About me</h1>
+        <p>I build websites that look great and help businesses stand out online.</p>
+    </div>
+    <div class="about-content">
+        <p>I'm a web designer and developer focused on creating clean, professional websites for small businesses, startups, and freelancers. Every project is an opportunity to solve real problems and deliver something that works for you—not just a template with your logo.</p>
+        <p>I work with modern tools and best practices so your site is fast, secure, and easy to update. Whether you need a simple landing page or a multi-page site with contact forms and integrations, I'll guide you through the process from idea to launch.</p>
+        <p>When I'm not coding, I'm learning new techniques and staying up to date with design trends so I can offer you solutions that feel current and perform well. Let's build something you're proud to share.</p>
+        <div class="btn-group" style="margin-top: 2rem;">
+            <a href="{% url 'templates' %}" class="btn btn-primary">See my templates</a>
+            <a href="{% url 'contact' %}" class="btn btn-outline">Say hello</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

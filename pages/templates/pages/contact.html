@@ -1,0 +1,32 @@
+{% extends 'pages/base.html' %}
+{% block title %}Contact{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-hero">
+        <h1>Contact</h1>
+        <p>Tell me about your project. I'll get back to you within 24–48 hours.</p>
+    </div>
+    <div class="contact-wrap">
+        <form class="contact-form" action="#" method="post">
+            {% csrf_token %}
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" required placeholder="Your name">
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required placeholder="you@example.com">
+
+            <label for="subject">Subject</label>
+            <input type="text" id="subject" name="subject" placeholder="e.g. New website inquiry">
+
+            <label for="message">Message</label>
+            <textarea id="message" name="message" required placeholder="Describe your project, timeline, and any questions..."></textarea>
+
+            <button type="submit" class="btn btn-primary">Send message</button>
+        </form>
+        <div class="contact-info">
+            <p>Prefer email? Reach me at <strong>hello@yourportfolio.com</strong></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

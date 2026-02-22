@@ -1,0 +1,38 @@
+{% extends 'pages/base.html' %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container">
+        <p class="hero-tag">Web Design & Development</p>
+        <h1>Launch Your Website in Days</h1>
+        <p>I provide professionally designed pre-built websites that help businesses go online quickly.
+            No long development time. No high cost. Just ready-to-use solutions.</p>
+        <div class="btn-group">
+            <a href="{% url 'templates' %}" class="btn btn-primary btn-hero">View templates</a>
+            <a href="{% url 'contact' %}" class="btn btn-subtle">Get a quote</a>
+        </div>
+    </div>
+</section>
+
+<section class="container">
+    <div class="section-title">
+        <h2>Why work with me</h2>
+        <p>Quality, clarity, and results—every project is treated like my own brand.</p>
+    </div>
+    <div class="card-grid">
+        <div class="card">
+            <h3>Custom design</h3>
+            <p>No generic themes. Your site is designed around your goals and your audience.</p>
+        </div>
+        <div class="card">
+            <h3>Fast & responsive</h3>
+            <p>Clean code and modern tech so your site loads quickly and works on every device.</p>
+        </div>
+        <div class="card">
+            <h3>Clear pricing</h3>
+            <p>Transparent packages and no hidden fees. You know what you're paying for.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
