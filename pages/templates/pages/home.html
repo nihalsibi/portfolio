@@ -4,10 +4,9 @@
 {% block content %}
 <section class="hero">
     <div class="container">
-        <p class="hero-tag">Web Design & Development</p>
-        <h1>Launch Your Website in Days</h1>
-        <p>I provide professionally designed pre-built websites that help businesses go online quickly.
-            No long development time. No high cost. Just ready-to-use solutions.</p>
+        <p class="hero-tag">{{ home_content.hero_tagline|default:"Web Design & Development" }}</p>
+        <h1>{{ home_content.hero_title|default:"Launch Your Website in Days" }}</h1>
+        <p>{{ home_content.hero_paragraph|default:"I provide professionally designed pre-built websites that help businesses go online quickly. No long development time. No high cost. Just ready-to-use solutions." }}</p>
         <div class="btn-group">
             <a href="{% url 'templates' %}" class="btn btn-primary btn-hero">View templates</a>
             <a href="{% url 'contact' %}" class="btn btn-subtle">Get a quote</a>

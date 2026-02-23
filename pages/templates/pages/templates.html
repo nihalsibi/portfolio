@@ -5,41 +5,23 @@
 <div class="container">
     <div class="page-hero">
         <h1>Choose Your Ready-To-Launch Website</h1>
-        <p>Choose a style that fits your brand. Each template can be customized with your content, colors, and images.</p>
+        <p>Browse templates you manage in the dashboard. Each one can be customized with your content, colors, and images.</p>
     </div>
     <div class="card-grid">
+        {% for t in templates %}
         <div class="template-card">
-            <div class="thumb">🖥️</div>
+            <div class="thumb">{{ t.icon|default:"🖥️" }}</div>
             <div class="body">
-                <h3>Business one-page</h3>
-                <p>Single-page site with hero, services, and contact. Ideal for freelancers and small businesses.</p>
-                <a href="{% url 'contact' %}?template=business" class="btn btn-outline">Inquire</a>
+                <h3>{{ t.name }}</h3>
+                {% if t.short_description %}
+                    <p>{{ t.short_description }}</p>
+                {% endif %}
+                <a href="{% url 'contact' %}?template={{ t.slug }}" class="btn btn-outline">Inquire</a>
             </div>
         </div>
-        <div class="template-card">
-            <div class="thumb">📄</div>
-            <div class="body">
-                <h3>Portfolio / CV</h3>
-                <p>Showcase your work and skills. Perfect for creatives, developers, and job seekers.</p>
-                <a href="{% url 'contact' %}?template=portfolio" class="btn btn-outline">Inquire</a>
-            </div>
-        </div>
-        <div class="template-card">
-            <div class="thumb">🛒</div>
-            <div class="body">
-                <h3>Product / landing</h3>
-                <p>Landing page with features, testimonials, and CTA. Great for products and campaigns.</p>
-                <a href="{% url 'contact' %}?template=landing" class="btn btn-outline">Inquire</a>
-            </div>
-        </div>
-        <div class="template-card">
-            <div class="thumb">🏢</div>
-            <div class="body">
-                <h3>Multi-page site</h3>
-                <p>Home, About, Services, and Contact. Full structure for agencies and studios.</p>
-                <a href="{% url 'contact' %}?template=multipage" class="btn btn-outline">Inquire</a>
-            </div>
-        </div>
+        {% empty %}
+        <p style="text-align: center; color: var(--text-muted);">No templates yet. Add some from the Django admin dashboard.</p>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
