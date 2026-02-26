@@ -10,11 +10,15 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-secret-key-change-in-produ
 
 DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1','https://portfolio-xn0b.onrender.com']
+ALLOWED_HOSTS = [
+    'portfolio-xn0b.onrender.com'
+]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://portfolio-xn0b.onrender.com'
 ]
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
