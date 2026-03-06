@@ -11,11 +11,11 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-secret-key-change-in-produ
 DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
 ALLOWED_HOSTS = [
-    'portfolio-xn0b.onrender.com'
+    'https://portfolio-1-wm94.onrender.com'
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://portfolio-xn0b.onrender.com'
+    'https://portfolio-1-wm94.onrender.com'
 ]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
