@@ -1,6 +1,6 @@
 /**
  * Cinematic frontend motion layer.
- * GSAP + ScrollTrigger when available; vanilla fallback for background motion.
+ * GSAP + ScrollTrigger when available; static fallback when unavailable.
  */
 (function() {
     'use strict';
@@ -9,6 +9,19 @@
         window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const hasFinePointer = window.matchMedia &&
         window.matchMedia('(pointer: fine)').matches;
+    const isTouchFirstDevice = ((navigator.maxTouchPoints || 0) > 0) ||
+        (window.matchMedia && window.matchMedia('(hover: none)').matches);
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const isLowPerformanceDevice = Boolean(
+        (connection && connection.saveData) ||
+        (typeof navigator.hardwareConcurrency === 'number' && navigator.hardwareConcurrency <= 4) ||
+        (typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 4)
+    );
+    const canUseMouseParallax = hasFinePointer && !isTouchFirstDevice && !isLowPerformanceDevice;
+    const MOUSE_PARALLAX_THROTTLE_MS = 48;
+    const MOUSE_PARALLAX_EASE = 0.16;
+    const MOUSE_PARALLAX_STOP_THRESHOLD = 0.008;
+    const MOUSE_PARALLAX_MAX_FRAMES = 36;
 
     const $ = (selector, scope = document) => scope.querySelector(selector);
     const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
@@ -53,59 +66,62 @@
         gsap.set(targets, { willChange: value });
     }
 
-    function splitHeroHeadline() {
-        const heading = $('.hero h1');
-        if (!heading) return [];
+    function hasAnimationRuntime(gsap, ScrollTrigger) {
+        return Boolean(
+            gsap &&
+            ScrollTrigger &&
+            typeof gsap.registerPlugin === 'function' &&
+            typeof gsap.config === 'function' &&
+            typeof gsap.defaults === 'function' &&
+            typeof gsap.set === 'function' &&
+            typeof gsap.to === 'function' &&
+            typeof gsap.fromTo === 'function' &&
+            typeof gsap.timeline === 'function' &&
+            typeof ScrollTrigger.config === 'function' &&
+            typeof ScrollTrigger.create === 'function' &&
+            typeof ScrollTrigger.refresh === 'function'
+        );
+    }
 
-        const text = (heading.dataset.motionText || heading.textContent || '').trim().replace(/\s+/g, ' ');
-        if (!text) return [heading];
+    function initBasicFallback() {
+        return;
+    }
 
-        heading.dataset.motionText = text;
-        heading.setAttribute('aria-label', text);
-        heading.textContent = '';
+    function initVisibilityPause(gsap, ScrollTrigger) {
+        let isPaused = false;
 
-        const words = text.split(' ');
-        const wordSpans = words.map((word, index) => {
-            const span = document.createElement('span');
-            span.className = 'motion-word';
-            span.textContent = word + (index === words.length - 1 ? '' : ' ');
-            heading.appendChild(span);
-            return span;
-        });
+        function setPaused(nextPaused) {
+            if (nextPaused === isPaused) return;
+            isPaused = nextPaused;
 
-        const groups = [];
-        let currentGroup = [];
-        let currentTop = null;
+            document.body.classList.toggle('is-motion-paused', isPaused);
 
-        wordSpans.forEach((span) => {
-            const top = Math.round(span.offsetTop);
-            if (currentTop === null) currentTop = top;
-
-            if (Math.abs(top - currentTop) > 4) {
-                groups.push(currentGroup);
-                currentGroup = [span];
-                currentTop = top;
-                return;
+            if (gsap.globalTimeline) {
+                if (isPaused) {
+                    gsap.globalTimeline.pause();
+                } else {
+                    gsap.globalTimeline.resume();
+                }
             }
 
-            currentGroup.push(span);
-        });
+            if (gsap.ticker) {
+                if (isPaused && typeof gsap.ticker.sleep === 'function') {
+                    gsap.ticker.sleep();
+                } else if (!isPaused && typeof gsap.ticker.wake === 'function') {
+                    gsap.ticker.wake();
+                }
+            }
 
-        if (currentGroup.length) groups.push(currentGroup);
+            if (!isPaused) {
+                ScrollTrigger.refresh();
+            }
+        }
 
-        const fragment = document.createDocumentFragment();
-        const lines = groups.map((group) => {
-            const line = document.createElement('span');
-            line.className = 'motion-line';
-            group.forEach((word) => line.appendChild(word));
-            fragment.appendChild(line);
-            return line;
-        });
+        document.addEventListener('visibilitychange', () => {
+            setPaused(document.hidden);
+        }, { passive: true });
 
-        heading.textContent = '';
-        heading.appendChild(fragment);
-
-        return lines;
+        setPaused(document.hidden);
     }
 
     function initScrollChrome(gsap) {
@@ -189,11 +205,11 @@
     function initHeroLoad(gsap) {
         const header = $('.site-header');
         const heroTag = $('.hero .hero-tag');
-        const headlineLines = splitHeroHeadline();
+        const heroHeading = $('.hero h1');
         const heroParagraph = $('.hero .container > p:not(.hero-tag)');
         const leftButton = $('.hero .btn-group .btn:nth-child(1)');
         const rightButton = $('.hero .btn-group .btn:nth-child(2)');
-        const heroTargets = [header, heroTag, ...headlineLines, heroParagraph, leftButton, rightButton]
+        const heroTargets = [header, heroTag, heroHeading, heroParagraph, leftButton, rightButton]
             .filter(Boolean);
 
         const timeline = gsap.timeline({
@@ -235,8 +251,8 @@
             }, 0.22);
         }
 
-        if (headlineLines.length) {
-            timeline.fromTo(headlineLines, {
+        if (heroHeading) {
+            timeline.fromTo(heroHeading, {
                 autoAlpha: 0,
                 y: 120,
                 filter: 'blur(18px)'
@@ -245,7 +261,6 @@
                 y: 0,
                 filter: 'blur(0px)',
                 duration: 1.15,
-                stagger: 0.16,
                 clearProps: 'opacity,visibility,transform,filter'
             }, 0.4);
         }
@@ -294,6 +309,8 @@
     }
 
     function initBackgroundParallax(gsap, ScrollTrigger) {
+        if (!gsap || !ScrollTrigger) return;
+
         const pageBg = $('.page-bg');
         const layerConfigs = [
             { element: $('.cinematic-beams'), y: -22 },
@@ -333,45 +350,23 @@
         });
         setScrollProgress(0);
 
-        if (gsap && ScrollTrigger) {
-            gsap.set([pageBg, ...backgroundLayers], { force3D: true });
+        gsap.set([pageBg, ...backgroundLayers], { force3D: true });
 
-            gsap.to(pageBg, {
-                '--bg-scroll-y': '-54px',
+        gsap.to(pageBg, {
+            '--bg-scroll-y': '-54px',
+            ease: 'none',
+            scrollTrigger: backgroundScrollTrigger()
+        });
+
+        layerConfigs.forEach(({ element, y }) => {
+            gsap.to(element, {
+                '--layer-scroll-y': `${y}px`,
                 ease: 'none',
                 scrollTrigger: backgroundScrollTrigger()
             });
+        });
 
-            layerConfigs.forEach(({ element, y }) => {
-                gsap.to(element, {
-                    '--layer-scroll-y': `${y}px`,
-                    ease: 'none',
-                    scrollTrigger: backgroundScrollTrigger()
-                });
-            });
-        } else {
-            let scrollRafId = 0;
-
-            function renderScrollShift() {
-                const documentElement = document.documentElement;
-                const scrollMax = Math.max(documentElement.scrollHeight - window.innerHeight, 1);
-                const scrollY = window.scrollY || window.pageYOffset || 0;
-
-                setScrollProgress(scrollY / scrollMax);
-                scrollRafId = 0;
-            }
-
-            function requestScrollShift() {
-                if (scrollRafId) return;
-                scrollRafId = requestAnimationFrame(renderScrollShift);
-            }
-
-            window.addEventListener('scroll', requestScrollShift, { passive: true });
-            window.addEventListener('resize', requestScrollShift, { passive: true });
-            requestScrollShift();
-        }
-
-        if (!hasFinePointer) return;
+        if (!canUseMouseParallax) return;
 
         const mouseLayers = [
             { element: pageBg, xVar: '--bg-mouse-x', yVar: '--bg-mouse-y', x: -10, y: -7 },
@@ -389,45 +384,94 @@
         let currentX = 0;
         let currentY = 0;
         let rafId = 0;
+        let frameCount = 0;
+        let lastPointerTime = -MOUSE_PARALLAX_THROTTLE_MS;
 
         function writeLayer(layer, x, y) {
             layer.element.style.setProperty(layer.xVar || '--layer-mouse-x', `${x.toFixed(2)}px`);
             layer.element.style.setProperty(layer.yVar || '--layer-mouse-y', `${y.toFixed(2)}px`);
         }
 
+        function cancelMouseShift() {
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = 0;
+            }
+            frameCount = 0;
+        }
+
+        function resetMouseShift() {
+            targetX = 0;
+            targetY = 0;
+            currentX = 0;
+            currentY = 0;
+            mouseLayers.forEach((layer) => writeLayer(layer, 0, 0));
+        }
+
         function renderMouseShift() {
-            currentX += (targetX - currentX) * 0.075;
-            currentY += (targetY - currentY) * 0.075;
+            if (document.hidden) {
+                cancelMouseShift();
+                return;
+            }
+
+            rafId = 0;
+            frameCount += 1;
+            currentX += (targetX - currentX) * MOUSE_PARALLAX_EASE;
+            currentY += (targetY - currentY) * MOUSE_PARALLAX_EASE;
 
             mouseLayers.forEach((layer) => {
                 writeLayer(layer, currentX * layer.x, currentY * layer.y);
             });
 
-            if (Math.abs(targetX - currentX) > 0.001 || Math.abs(targetY - currentY) > 0.001) {
+            const shouldContinue = (
+                frameCount < MOUSE_PARALLAX_MAX_FRAMES &&
+                (Math.abs(targetX - currentX) > MOUSE_PARALLAX_STOP_THRESHOLD ||
+                    Math.abs(targetY - currentY) > MOUSE_PARALLAX_STOP_THRESHOLD)
+            );
+
+            if (shouldContinue) {
                 rafId = requestAnimationFrame(renderMouseShift);
                 return;
             }
 
             currentX = targetX;
             currentY = targetY;
+            mouseLayers.forEach((layer) => {
+                writeLayer(layer, currentX * layer.x, currentY * layer.y);
+            });
+            frameCount = 0;
             rafId = 0;
         }
 
         function requestMouseShift() {
-            if (rafId) return;
+            if (document.hidden || rafId) return;
             rafId = requestAnimationFrame(renderMouseShift);
         }
 
         window.addEventListener('pointermove', (event) => {
+            if (document.hidden) return;
+
+            const eventTime = event.timeStamp || performance.now();
+            if (eventTime - lastPointerTime < MOUSE_PARALLAX_THROTTLE_MS) return;
+
+            lastPointerTime = eventTime;
             targetX = (event.clientX / Math.max(window.innerWidth, 1)) - 0.5;
             targetY = (event.clientY / Math.max(window.innerHeight, 1)) - 0.5;
+            frameCount = 0;
             requestMouseShift();
         }, { passive: true });
 
         document.addEventListener('mouseleave', () => {
             targetX = 0;
             targetY = 0;
+            frameCount = 0;
             requestMouseShift();
+        }, { passive: true });
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) return;
+            cancelMouseShift();
+            resetMouseShift();
         }, { passive: true });
     }
 
@@ -822,7 +866,6 @@
                 if (Math.abs(nextWidth - lastWidth) < 16) return;
                 lastWidth = nextWidth;
 
-                if ($('.hero h1[data-motion-text]')) splitHeroHeadline();
                 ScrollTrigger.refresh();
             }, 180);
         }, { passive: true });
@@ -837,15 +880,13 @@
         const gsap = window.gsap;
         const ScrollTrigger = window.ScrollTrigger;
 
-        if (prefersReducedMotion) {
-            initScrollChrome();
-            initReducedOrFallback();
+        if (!hasAnimationRuntime(gsap, ScrollTrigger)) {
+            initBasicFallback();
             return;
         }
 
-        if (!gsap || !ScrollTrigger) {
+        if (prefersReducedMotion) {
             initScrollChrome();
-            initBackgroundParallax();
             initReducedOrFallback();
             return;
         }
@@ -859,6 +900,7 @@
             limitCallbacks: true
         });
 
+        initVisibilityPause(gsap, ScrollTrigger);
         initScrollChrome(gsap);
         initHeroLoad(gsap);
         initBackgroundParallax(gsap, ScrollTrigger);

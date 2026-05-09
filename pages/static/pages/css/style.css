@@ -503,13 +503,21 @@ body {
 }
 
 body.is-scrolling .page-bg::before,
+body.is-motion-paused .page-bg::before,
 body.is-scrolling .page-bg::after,
+body.is-motion-paused .page-bg::after,
 body.is-scrolling .cinematic-layer::before,
+body.is-motion-paused .cinematic-layer::before,
 body.is-scrolling .ambient-glow::before,
+body.is-motion-paused .ambient-glow::before,
 body.is-scrolling .ambient-grain::before,
+body.is-motion-paused .ambient-grain::before,
 body.is-scrolling .card-icon,
+body.is-motion-paused .card-icon,
 body.is-scrolling .template-card .thumb::before,
-body.is-scrolling .cta-content .btn.motion-shine::after {
+body.is-motion-paused .template-card .thumb::before,
+body.is-scrolling .cta-content .btn.motion-shine::after,
+body.is-motion-paused .cta-content .btn.motion-shine::after {
     animation-play-state: paused;
 }
 
