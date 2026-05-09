@@ -502,6 +502,26 @@ body {
     transition-property: none;
 }
 
+body.is-scrolling .page-bg::before,
+body.is-scrolling .page-bg::after,
+body.is-scrolling .cinematic-layer::before,
+body.is-scrolling .ambient-glow::before,
+body.is-scrolling .ambient-grain::before,
+body.is-scrolling .card-icon,
+body.is-scrolling .template-card .thumb::before,
+body.is-scrolling .cta-content .btn.motion-shine::after {
+    animation-play-state: paused;
+}
+
+body.is-scrolling .site-header {
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+}
+
+body.is-scrolling .ambient-grain {
+    opacity: 0.035;
+}
+
 /* Headings – white; body text – soft white */
 h1, h2, h3, h4, h5, h6 {
     color: var(--heading);
