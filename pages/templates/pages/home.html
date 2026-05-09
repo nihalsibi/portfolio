@@ -2,6 +2,7 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
+<!-- Premium Hero Section -->
 <section class="hero">
     <div class="container">
         <p class="hero-tag">{{ home_content.hero_tagline|default:"Web Design & Development" }}</p>
@@ -14,23 +15,64 @@
     </div>
 </section>
 
-<section class="container">
-    <div class="section-title">
-        <h2>Why work with me</h2>
-        <p>Quality, clarity, and results—every project is treated like my own brand.</p>
+<!-- Stats/Metrics Section (Premium SaaS style) -->
+<section class="stats-section">
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value"><span data-stat-value="50" data-stat-suffix="+">0+</span></div>
+                <div class="stat-label">Projects Delivered</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value"><span data-stat-value="100" data-stat-suffix="%">0%</span></div>
+                <div class="stat-label">Client Satisfaction</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value"><span data-stat-value="5" data-stat-suffix="+ yrs">0+ yrs</span></div>
+                <div class="stat-label">Experience</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value"><span data-stat-value="99" data-stat-suffix=".9%">0%</span></div>
+                <div class="stat-label">Uptime Guaranteed</div>
+            </div>
+        </div>
     </div>
-    <div class="card-grid">
-        <div class="card">
-            <h3>Custom design</h3>
-            <p>No generic themes. Your site is designed around your goals and your audience.</p>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="section-title">
+            <h2>Why work with me</h2>
+            <p>Quality, clarity, and results—every project is treated like my own brand.</p>
         </div>
-        <div class="card">
-            <h3>Fast & responsive</h3>
-            <p>Clean code and modern tech so your site loads quickly and works on every device.</p>
+        <div class="card-grid">
+            <div class="card">
+                <div class="card-icon">✨</div>
+                <h3>Custom design</h3>
+                <p>No generic themes. Your site is designed around your goals and your audience.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">⚡</div>
+                <h3>Fast & responsive</h3>
+                <p>Clean code and modern tech so your site loads quickly and works on every device.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">💎</div>
+                <h3>Clear pricing</h3>
+                <p>Transparent packages and no hidden fees. You know what you're paying for.</p>
+            </div>
         </div>
-        <div class="card">
-            <h3>Clear pricing</h3>
-            <p>Transparent packages and no hidden fees. You know what you're paying for.</p>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to transform your online presence?</h2>
+            <p>Let's create something amazing together. Start with a free consultation.</p>
+            <a href="{% url 'contact' %}" class="btn btn-primary btn-hero">Start Your Project</a>
         </div>
     </div>
 </section>

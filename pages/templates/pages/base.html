@@ -11,16 +11,15 @@
     <link rel="stylesheet" href="{% static 'pages/css/style.css' %}">
 </head>
 <body>
-    <div class="page-bg" style="background-image: url('{% static 'pages/images/background.jpg' %}');"></div>
-    <div class="particles" aria-hidden="true">
-        <span class="particle"></span>
-        <span class="particle"></span>
-        <span class="particle"></span>
-        <span class="particle"></span>
-        <span class="particle"></span>
-        <span class="particle"></span>
-        <span class="particle"></span>
-        <span class="particle"></span>
+    <div class="page-bg" style="background-image: url('{% static 'pages/images/background.png' %}');"></div>
+    <div class="cinematic-bg" aria-hidden="true">
+        <span class="cinematic-layer cinematic-beams"></span>
+        <span class="cinematic-layer cinematic-depth cinematic-depth-one"></span>
+        <span class="cinematic-layer cinematic-depth cinematic-depth-two"></span>
+        <span class="ambient-glow ambient-glow-one"></span>
+        <span class="ambient-glow ambient-glow-two"></span>
+        <span class="ambient-glow ambient-glow-three"></span>
+        <span class="ambient-grain"></span>
     </div>
     <header class="site-header">
         <nav class="container nav">
@@ -58,36 +57,10 @@
             document.querySelector('.nav-links').classList.toggle('open');
             this.classList.toggle('active');
         });
-
-        (function() {
-            var header = document.querySelector('.site-header');
-            var lastScrollY = window.scrollY || window.pageYOffset;
-            var threshold = 60;
-
-            function onScroll() {
-                var scrollY = window.scrollY || window.pageYOffset;
-                if (scrollY <= 20) {
-                    header.classList.remove('nav-hidden');
-                } else if (scrollY > lastScrollY && scrollY > threshold) {
-                    header.classList.add('nav-hidden');
-                } else if (scrollY < lastScrollY) {
-                    header.classList.remove('nav-hidden');
-                }
-                lastScrollY = scrollY;
-            }
-
-            var ticking = false;
-            window.addEventListener('scroll', function() {
-                if (!ticking) {
-                    requestAnimationFrame(function() {
-                        onScroll();
-                        ticking = false;
-                    });
-                    ticking = true;
-                }
-            }, { passive: true });
-        })();
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="{% static 'pages/js/animations.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
